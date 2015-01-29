@@ -36,6 +36,7 @@ function wiredep(opts) {
     ('bower.json', opts.bowerJson || JSON.parse($.fs.readFileSync($.path.join(cwd, './bower.json'))))
     ('bower-directory', opts.directory || findBowerDirectory(cwd))
     ('cwd', cwd)
+    ('encoding', opts.encoding || 'utf8')
     ('dependencies', opts.dependencies === false ? false : true)
     ('detectable-file-types', [])
     ('dev-dependencies', opts.devDependencies)
@@ -62,11 +63,11 @@ function wiredep(opts) {
 
   if (!opts.stream && opts.src) {
     (Array.isArray(opts.src) ? opts.src : [opts.src]).
-      forEach(function (pattern) {
-        config.set('src', config.get('src').concat($.glob.sync(pattern)));
-      });
+        forEach(function (pattern) {
+            config.set('src', config.get('src').concat($.glob.sync(pattern, {cwd: cwd})));
+        });
   }
-
+  
   require('./lib/detect-dependencies')(config);
   require('./lib/inject-dependencies')(config);
 
